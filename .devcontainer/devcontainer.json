@@ -1,0 +1,27 @@
+{
+    "name": "CFML Jupyter",
+    "workspaceFolder": "/workspace",
+    "dockerComposeFile": [
+        "docker-compose.devcontainer.yml"
+    ],
+    "service": "jupyter",
+    // Set *default* container specific settings.json values on container create.
+    "settings": {
+        "terminal.integrated.shell.linux": "/bin/bash"
+    },
+    // Add the IDs of extensions you want installed when the container is created.
+    "extensions": [
+		"formulahendry.auto-close-tag",
+		"kamasamak.vscode-cfml",
+		"ms-toolsai.jupyter",
+		"ms-python.python"
+	],
+    // Use 'forwardPorts' to make a list of ports inside the container available locally.
+    "forwardPorts": [
+        8888
+    ],
+    // Use 'postCreateCommand' to run commands after the container is created.
+    "postCreateCommand": ""
+    // Uncomment to connect as a non-root user. See https://aka.ms/vscode-remote/containers/non-root.
+    // "remoteUser": "node"
+}
