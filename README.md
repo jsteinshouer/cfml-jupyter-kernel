@@ -7,7 +7,7 @@ It is based on the concept of a [Python wrapper kernel](https://jupyter-client.r
 ## Running with Docker
 
 ```bash
-docker compose up
+docker compose -f ./docker/docker-compose.yml up
 ```
 
 Go to http://127.0.0.1:8888/lab?token=x to access the Jupyter Lab application.
