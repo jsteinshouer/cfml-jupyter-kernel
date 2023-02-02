@@ -1,21 +1,20 @@
 from ipykernel.kernelbase import Kernel
-from pexpect import replwrap, EOF
-import pexpect
-
-PEXPECT_PROMPT = u'CFML-REPL:'
-PEXPECT_CONTINUATION_PROMPT = u'.............:'
+import subprocess
+import os
 
 class CFMLKernel(Kernel):
     implementation = 'CFML'
     implementation_version = '1.0'
     language = 'CFML'
-    language_version = '0.1'
+    language_version = '1.0'
     language_info = {
         'name': 'CFML',
         'mimetype': 'text/x-html',
         'file_extension': '.cfm'
     }
     banner = "CFML kernel"
+
+    PROMPT_STRINGS = ["CFML-REPL: ", ".............: "]
 
     def __init__(self, **kwargs):
         Kernel.__init__(self, **kwargs)
@@ -25,15 +24,20 @@ class CFMLKernel(Kernel):
                    allow_stdin=False):
         if not silent:
 
-            resp = self.repl.run_command(code.strip(), timeout=5)
             code_lines = code.splitlines()
-            resp_lines = resp.strip().splitlines()
-            new_resp = [];
-            for line in resp_lines:
-                if not any(line.strip() == x.strip() for x in code_lines):
-                    new_resp.append(line)
 
-            stream_content = {'name': 'stdout', 'text': "\n".join(new_resp).strip()}
+            response = [];
+            for line in code_lines:  
+                self.repl.stdin.write( bytes( f"{line.strip()}\n".encode("utf-8") ) )
+                self.repl.stdin.flush()
+                output = self._search_for_output(repl=self.repl)
+                
+                for string in self.PROMPT_STRINGS:
+                    output = output.replace(string,"")
+                response.append(output)
+            
+
+            stream_content = {'name': 'stdout', 'text': "".join(response)}
             self.send_response(self.iopub_socket, 'stream', stream_content)
 
         return {'status': 'ok',
@@ -44,16 +48,30 @@ class CFMLKernel(Kernel):
                }
 
     def _create_repl(self):
-        child = pexpect.spawn("box", args=['repl','script=false'], timeout=30, echo=False,
-                encoding='utf-8', codec_errors='replace')
+        my_env = os.environ.copy()
+        my_env["BOX_JAVA_ARGS"] = "-Dorg.jline.terminal.type=dumb"
+        my_env["box_config_nonInteractiveMode"] = "false"
+        my_env["box_config_colorInDumbTerminal"] = "true"
+        cfml_repl = subprocess.Popen(
+            [
+                "box",
+                "repl",
+                "script=false"
+            ],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            env=my_env
+        )
+        self._search_for_output(repl=cfml_repl)
 
-        orig_prompt =  'CFML-REPL:'
+        return cfml_repl
 
-        repl = replwrap.REPLWrapper(child, orig_prompt = orig_prompt,
-                                    prompt_change=None,
-                                    extra_init_cmd="PROMPT_COMMAND=''")
+    def _search_for_output(self, repl):
+        buffer = ""
+        while not any(string in buffer for string in self.PROMPT_STRINGS):
+            buffer = buffer + repl.stdout.read1(1).decode("utf-8")
+        return buffer
 
-        return repl
 
 if __name__ == '__main__':
     from ipykernel.kernelapp import IPKernelApp

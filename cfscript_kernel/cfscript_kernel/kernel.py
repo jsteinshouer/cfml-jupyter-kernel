@@ -1,24 +1,19 @@
 from ipykernel.kernelbase import Kernel
-from pexpect import replwrap, EOF
-import subprocess
-import re
-import base64
-import pexpect
-
-PEXPECT_PROMPT = u'CFSCRIPT-REPL: '
-PEXPECT_CONTINUATION_PROMPT = u'.............:'
+import subprocess, os
 
 class CFScriptKernel(Kernel):
     implementation = 'CFScript'
     implementation_version = '1.0'
     language = 'CFML'
-    language_version = '0.1'
+    language_version = '1.0'
     language_info = {
         'name': 'CFScript',
         'mimetype': 'text/x-javascript',
         'file_extension': '.cfm'
     }
     banner = "CFScript kernel"
+
+    PROMPT_STRINGS = ["CFSCRIPT-REPL: ", ".............: "]
 
     def __init__(self, **kwargs):
         Kernel.__init__(self, **kwargs)
@@ -28,15 +23,20 @@ class CFScriptKernel(Kernel):
                    allow_stdin=False):
         if not silent:
 
-            resp = self.repl.run_command(code.strip())
             code_lines = code.splitlines()
-            resp_lines = resp.strip().splitlines()
-            new_resp = [];
-            for line in resp_lines:
-                if not any(line.strip() == x.strip() for x in code_lines):
-                    new_resp.append(line)
 
-            stream_content = {'name': 'stdout', 'text': "\n".join(new_resp).strip()}
+            response = [];
+            for line in code_lines:  
+                self.repl.stdin.write( bytes( f"{line.strip()}\n".encode("utf-8") ) )
+                self.repl.stdin.flush()
+                output = self._search_for_output(repl=self.repl)
+                
+                for string in self.PROMPT_STRINGS:
+                    output = output.replace(string,"")
+                response.append(output)
+            
+
+            stream_content = {'name': 'stdout', 'text': "".join(response)}
             self.send_response(self.iopub_socket, 'stream', stream_content)
 
         return {'status': 'ok',
@@ -47,17 +47,28 @@ class CFScriptKernel(Kernel):
                }
 
     def _create_repl(self):
-        cfscript_repl = pexpect.spawn("box", args=['repl'], echo=False,encoding='utf-8')
-        
-        # Test to see if this could work on Windows - https://pexpect.readthedocs.io/en/stable/overview.html#pexpect-on-windows
-        #cfscript_repl = pexpect.popen_spawn.PopenSpawn("box repl",encoding='utf-8')
+        my_env = os.environ.copy()
+        my_env["BOX_JAVA_ARGS"] = "-Dorg.jline.terminal.type=dumb"
+        my_env["box_config_nonInteractiveMode"] = "false"
+        my_env["box_config_colorInDumbTerminal"] = "true"
+        cfscript_repl = subprocess.Popen(
+            [
+                "box",
+                "repl"
+            ],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            env=my_env
+        )
+        self._search_for_output(repl=cfscript_repl)
 
-        orig_prompt =  u'CFSCRIPT-REPL: '
-        cfscript_repl_wrapper = replwrap.REPLWrapper(cfscript_repl, orig_prompt = orig_prompt,
-                                    prompt_change=None,
-                                    extra_init_cmd="PROMPT_COMMAND=''")
-
-        return cfscript_repl_wrapper
+        return cfscript_repl
+    
+    def _search_for_output(self,repl):
+        buffer = ""
+        while not any(string in buffer for string in self.PROMPT_STRINGS):
+            buffer = buffer + repl.stdout.read1(1).decode("utf-8")
+        return buffer
 
 if __name__ == '__main__':
     from ipykernel.kernelapp import IPKernelApp
