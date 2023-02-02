@@ -1,9 +1,8 @@
 # Jupyter Kernel for CFML
 
-This is a proof-of-concept for creating a Jupyter Kernel powered by the [CommandBox REPL](https://commandbox.ortusbooks.com/usage/repl). 
+This is an attempt at creating a Jupyter Kernel for CFML powered by the [CommandBox REPL](https://commandbox.ortusbooks.com/usage/repl). 
 
-It is based on the concept of a [Python wrapper kernel](https://jupyter-client.readthedocs.io/en/latest/wrapperkernels.html). It is a work in progress. It has known issues and has not been battle tested.
-
+It is based on the concept of a [Python wrapper kernel](https://jupyter-client.readthedocs.io/en/latest/wrapperkernels.html). I do not have a lot of experience working in Python so there are probably a lot of things that can be improved here.
 ## Run on mybinder.org
 
 You can try it out and create CFML notebooks using this link:
@@ -20,7 +19,6 @@ docker compose -f ./docker/docker-compose.yml up
 ```
 
 Go to http://127.0.0.1:8888/lab?token=x to access the Jupyter Lab application.
-
 
 ### Resources
 
