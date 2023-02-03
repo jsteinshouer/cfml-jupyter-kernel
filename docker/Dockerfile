@@ -45,7 +45,3 @@ USER $NB_UID
 
 # Let's define this parameter to install jupyter lab instead of the default juyter notebook command so we don't have to use it when running the container with the option -e
 ENV JUPYTER_ENABLE_LAB=yes
-# CommandBox args
-ENV BOX_JAVA_ARGS=-Dorg.jline.terminal.type=dumb
-ENV box_config_colorInDumbTerminal=true
-ENV box_config_nonInteractiveMode=true

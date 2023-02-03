@@ -48,7 +48,6 @@ class CFScriptKernel(Kernel):
 
     def _create_repl(self):
         my_env = os.environ.copy()
-        my_env["BOX_JAVA_ARGS"] = "-Dorg.jline.terminal.type=dumb"
         my_env["box_config_nonInteractiveMode"] = "false"
         my_env["box_config_colorInDumbTerminal"] = "true"
         cfscript_repl = subprocess.Popen(
