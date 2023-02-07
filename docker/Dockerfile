@@ -15,21 +15,14 @@ RUN apt-get update \
     && apt-get update \
     && apt-get install -y zulu11-jre-headless
 
-COPY ./cfml_kernel /home/jovyan/kernels/cfml_kernel
-COPY ./cfscript_kernel /home/jovyan/kernels/cfscript_kernel
+COPY ./cfml_kernel /home/jovyan/.jupyter/kernels/cfml_kernel
+COPY ./cfscript_kernel /home/jovyan/.jupyter/kernels/cfscript_kernel
 
-RUN chown -R $NB_UID /home/jovyan/kernels \
-    && pip install -e ./kernels/cfscript_kernel \
+RUN chown -R $NB_UID /home/jovyan/.jupyter/kernels \
+    && pip install -e ./.jupyter/kernels/cfscript_kernel \
     && python -m cfscript_kernel.install \
-    && pip install -e ./kernels/cfml_kernel \
+    && pip install -e ./.jupyter/kernels/cfml_kernel \
     && python -m cfml_kernel.install
-
-# Installs the latest CommandBox Binary
-# RUN mkdir -p /home/jovyan/.bin \ 
-#     && curl -k  -o /home/jovyan/box.zip -location "https://downloads.ortussolutions.com/ortussolutions/commandbox/5.7.0/commandbox-bin-5.7.0.zip" \
-#     && unzip /home/jovyan/box.zip -d /home/jovyan/.bin && chmod 755 /home/jovyan/.bin/box && rm -f /home/jovyan/box.zip \
-#     && echo "commandbox_home=${COMMANDBOX_HOME}" > /home/jovyan/.bin/commandbox.properties \
-#     && echo "$(box version) successfully installed"
 
 # Install CommandBox from minibox to help make the image smaller
 COPY --from=foundeo/minibox:2023.01 /opt/box /home/jovyan/.bin

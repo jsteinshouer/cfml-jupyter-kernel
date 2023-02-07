@@ -5,8 +5,8 @@ services:
             context: ..
             dockerfile: ./docker/Dockerfile
         volumes:
-            - ../cfml_kernel:/home/jovyan/kernels/cfml_kernel
-            - ../cfscript_kernel:/home/jovyan/kernels/cfscript_kernel
+            - ../cfml_kernel:/home/jovyan/.jupyter/kernels/cfml_kernel
+            - ../cfscript_kernel:/home/jovyan/.jupyter/kernels/cfscript_kernel
             - ../notebooks:/home/jovyan/work
         ports:
             - 8888:8888
