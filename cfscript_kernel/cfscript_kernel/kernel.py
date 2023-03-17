@@ -33,8 +33,9 @@ class CFScriptKernel(Kernel):
                 
                 for string in self.PROMPT_STRINGS:
                     output = output.replace(string,"")
-                response.append(output)
-            
+
+                if (output.__contains__("[EMPTY STRING]") == False):
+                    response.append(output.strip())
 
             stream_content = {'name': 'stdout', 'text': "".join(response)}
             self.send_response(self.iopub_socket, 'stream', stream_content)
