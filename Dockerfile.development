@@ -15,14 +15,14 @@ RUN apt-get update \
     && apt-get update \
     && apt-get install -y zulu11-jre-headless
 
-COPY ./cfml_kernel /home/jovyan/.jupyter/kernels/cfml_kernel
-COPY ./cfscript_kernel /home/jovyan/.jupyter/kernels/cfscript_kernel
+# Copy files to the /workspace dir for installation
+COPY . /workspace
 
-RUN chown -R $NB_UID /home/jovyan/.jupyter/kernels \
-    && pip install -e ./.jupyter/kernels/cfscript_kernel \
-    && python -m cfscript_kernel.install \
-    && pip install -e ./.jupyter/kernels/cfml_kernel \
-    && python -m cfml_kernel.install
+# Install the python module in development mode and install the kernels
+RUN chown -R $NB_UID /workspace \
+    && python -m pip install -e /workspace \
+    && python -m cfml_kernel.cfscript.install \
+    && python -m cfml_kernel.cfml.install
 
 # Install CommandBox from minibox to help make the image smaller
 COPY --from=foundeo/minibox:2023.01 /opt/box /home/jovyan/.bin

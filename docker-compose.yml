@@ -1,0 +1,13 @@
+services:
+
+    cfml-jupyter-kernel:
+        build:
+            context: .
+            dockerfile: Dockerfile.development
+        volumes:
+            - .:/workspace
+            - ./notebooks:/home/jovyan/cfml_notebooks
+        ports:
+            - 8888:8888
+        environment:
+            - JUPYTER_TOKEN=123

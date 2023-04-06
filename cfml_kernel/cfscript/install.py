@@ -8,7 +8,7 @@ from jupyter_client.kernelspec import KernelSpecManager
 from tempfile import TemporaryDirectory
 
 kernel_json = {
-    "argv": [sys.executable, "-m", "cfscript_kernel", "-f", "{connection_file}"],
+    "argv": [sys.executable, "-m", "cfml_kernel.cfscript", "-f", "{connection_file}"],
     "display_name": "CFML (Script)",
     "language": "CFML"
 }

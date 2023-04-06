@@ -30,25 +30,22 @@ You can also run it with Docker if you do not want to mess around with installin
 
 ```bash
 git clone https://github.com/jsteinshouer/cfml-jupyter-kernel.git
-cd cfml-jupyter-kernel
 ```
 
 ## Install Kernel
 
 ```bash
-pip install ./cfscript_kernel
-python -m cfscript_kernel.install
-pip install ./cfml_kernel
-python -m cfml_kernel.install
+pip install ./cfml-jupyter-kernel
+python -m cfml_kernel.cfscript.install
+python -m cfml_kernel.cfml.install
 ```
 
 If you want to develop on the Kernel you can add the `-e` flag to make it editable.
 
 ```bash
-pip install -e ./cfscript_kernel
-python -m cfscript_kernel.install
-pip install -e ./cfml_kernel
-python -m cfml_kernel.install
+pip install -e ./cfml-jupyter-kernel
+python -m cfml_kernel.cfscript.install
+python -m cfml_kernel.cfml.install
 ```
 
 ## Run it
@@ -68,10 +65,10 @@ You can try it out and create CFML notebooks using this link:
 ## Github Codespaces / Dev Container
 
 You can fork this repo and run it with Github Codespaces or clone the repo and run it locally with the VS Code Dev Containers extension.
-## Running with Docker
+## Running locally with Docker
 
 ```bash
-docker compose -f ./docker/docker-compose.yml up
+docker compose up
 ```
 
 Go to http://127.0.0.1:8888/lab?token=123 to access the Jupyter Lab application.
