@@ -1,5 +1,5 @@
 # Dockerfile for primary image
-FROM jupyter/base-notebook:ubuntu-22.04
+FROM jupyter/base-notebook:ubuntu-22.04 as base
 
 ENV COMMANDBOX_HOME /home/jovyan/.CommandBox
 ENV PATH /home/jovyan/.bin:$PATH
@@ -15,15 +15,6 @@ RUN apt-get update \
     && apt-get update \
     && apt-get install -y zulu11-jre-headless
 
-# Copy files to the /workspace dir for installation
-COPY . /workspace
-
-# Install the python module in development mode and install the kernels
-RUN chown -R $NB_UID /workspace \
-    && python -m pip install -e /workspace \
-    && python -m cfml_kernel.cfscript.install \
-    && python -m cfml_kernel.cfml.install
-
 # Install CommandBox from minibox to help make the image smaller
 COPY --from=foundeo/minibox:2023.01 /opt/box /home/jovyan/.bin
 COPY --from=foundeo/minibox:2023.01 /root/.CommandBox/ /home/jovyan/.CommandBox/
@@ -38,3 +29,29 @@ USER $NB_UID
 
 # Let's define this parameter to install jupyter lab instead of the default juyter notebook command so we don't have to use it when running the container with the option -e
 ENV JUPYTER_ENABLE_LAB=yes
+
+FROM base AS development 
+# Copy files to the /workspace dir for installation
+COPY . /workspace
+
+# Install the python module in development mode and install the kernels
+USER root
+RUN chown -R $NB_UID /workspace \
+    && python -m pip install -e /workspace \
+    && python -m cfml_kernel.cfscript.install \
+    && python -m cfml_kernel.cfml.install
+
+USER $NB_UID
+
+FROM base AS main
+# Copy files
+COPY . /home/jovyan/.jupyter/cfml-kernel
+
+# Install the python module and kernels
+USER root
+RUN chown -R $NB_UID /home/jovyan/.jupyter/cfml-kernel \
+    && python -m pip install /home/jovyan/.jupyter/cfml-kernel \
+    && python -m cfml_kernel.cfscript.install \
+    && python -m cfml_kernel.cfml.install
+
+USER $NB_UID

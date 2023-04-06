@@ -3,7 +3,8 @@ services:
     cfml-jupyter-kernel:
         build:
             context: .
-            dockerfile: Dockerfile.development
+            dockerfile: build.Dockerfile
+            target: development
         volumes:
             - .:/workspace
             - ./notebooks:/home/jovyan/cfml_notebooks
