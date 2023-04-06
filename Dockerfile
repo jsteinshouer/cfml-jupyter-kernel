@@ -11,7 +11,7 @@ FROM ghcr.io/jsteinshouer/cfml-jupyter:1.0.0
 USER root
 
 ARG EXAMPLES_PATH=/home/$NB_USER/cfml_examples
-COPY notebooks/*.ipynb $EXAMPLES_PATH/
+COPY notebook_examples/*.ipynb $EXAMPLES_PATH/
 RUN chown -R $NB_UID:users $EXAMPLES_PATH
 
 USER $NB_UID

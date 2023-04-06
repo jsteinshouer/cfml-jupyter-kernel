@@ -26,6 +26,11 @@ class CommandBoxWrapper():
             self._start_repl()
 
             return output
+        elif (code[:8] == "$loadjar"):
+            #Load jar
+            output = self._load_jar(code)
+
+            return output
         else:
             code_lines = code.splitlines()
 
@@ -50,6 +55,24 @@ class CommandBoxWrapper():
         output = self._search_for_output()
         for string in self.PROMPT_STRINGS:
             output = output.replace(string,"")
+        return output
+    
+    def _load_jar(self,code):
+
+        loadjar_expression = "loadJar = (path) => { \
+            filePath = getDirectoryFromPath( getCurrentTemplatePath() ) & path; \
+            new commandbox.system.util.FileSystem().classLoad( filePath ); \
+            return 'Loaded ' & filePath; \
+        }"
+        self.box_shell.stdin.write(bytes(f"{loadjar_expression}\n".encode("utf-8")))
+        self.box_shell.stdin.flush()
+        self._search_for_output()
+        self.box_shell.stdin.write(bytes(f"loadJar('{code.replace('$loadjar','').strip()}');\n".encode("utf-8")))
+        self.box_shell.stdin.flush()
+        output = self._search_for_output()
+        for string in self.PROMPT_STRINGS:
+            output = output.replace(string,"")
+
         return output
 
     def _start_repl(self):
