@@ -67,8 +67,17 @@ You can try it out and create CFML notebooks using this link:
 You can fork this repo and run it with Github Codespaces or clone the repo and run it locally with the VS Code Dev Containers extension.
 ## Running locally with Docker
 
+If you have cloned the repo you can just use `docker compose` to run it.
+
 ```bash
 docker compose up
 ```
 
 Go to http://127.0.0.1:8888/lab?token=123 to access the Jupyter Lab application.
+
+However there is a pre-built image you can use instead. This will run the Jupyter lab application using the pre-built image.
+
+```
+docker run -v ${PWD}:/home/jovyan/work -p 8888:8888 -e JUPYTER_TOKEN=123 ghcr.io/jsteinshouer/cfml-jupyter:latest
+```
+
