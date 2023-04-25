@@ -6,7 +6,7 @@
 #     docker run --rm -p 8888:8888 --name cfml-jupyter-binder cfml-jupyter-binder:latest jupyter lab --ServerApp.token=''
 #
 
-FROM ghcr.io/jsteinshouer/cfml-jupyter:1.0.0
+FROM ghcr.io/jsteinshouer/cfml-jupyter:1.1.0
 
 USER root
 
