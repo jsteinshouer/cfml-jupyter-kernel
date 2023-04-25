@@ -15,7 +15,7 @@ class CommandBoxWrapper():
 
     def do_execute(self, code):
 
-        if (code[:8] == "$install"):
+        if (code[:8] == "$install" or code[:8] == "%install"):
             # stop the repl
             self._stop_repl()
 
@@ -26,7 +26,7 @@ class CommandBoxWrapper():
             self._start_repl()
 
             return output
-        elif (code[:8] == "$loadjar"):
+        elif (code[:8] == "$loadjar" or code[:8] == "%loadjar"):
             #Load jar
             output = self._load_jar(code)
 
@@ -50,7 +50,7 @@ class CommandBoxWrapper():
             return "\n".join(response).strip()
     
     def _box_install(self,code):
-        self.box_shell.stdin.write(bytes(f"install {code.replace('$install','')}\n".encode("utf-8")))
+        self.box_shell.stdin.write(bytes(f"install {code.replace('$install','').replace('%install','')}\n".encode("utf-8")))
         self.box_shell.stdin.flush()
         output = self._search_for_output()
         for string in self.PROMPT_STRINGS:
@@ -67,7 +67,7 @@ class CommandBoxWrapper():
         self.box_shell.stdin.write(bytes(f"{loadjar_expression}\n".encode("utf-8")))
         self.box_shell.stdin.flush()
         self._search_for_output()
-        self.box_shell.stdin.write(bytes(f"loadJar('{code.replace('$loadjar','').strip()}');\n".encode("utf-8")))
+        self.box_shell.stdin.write(bytes(f"loadJar('{code.replace('$loadjar','').replace('%loadjar','').strip()}');\n".encode("utf-8")))
         self.box_shell.stdin.flush()
         output = self._search_for_output()
         for string in self.PROMPT_STRINGS:
