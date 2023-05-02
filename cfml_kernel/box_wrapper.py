@@ -9,6 +9,8 @@ class CommandBoxWrapper():
         # logging.basicConfig(filename='box_wrapper_debug.log',
         #                     encoding='utf-8', level=LOG_LEVEL)
         self.CF_REPL_TYPE = repl_type
+        # New version of commandbox (5.9.0) uses a prompt with the current working directory in it
+        self.PROMPT_STRINGS.append("CommandBox:" + os.getcwd().split(os.sep)[-1] + ">");
         self.box_shell = self._create_process()
         self._search_for_output()
         self._start_repl()
