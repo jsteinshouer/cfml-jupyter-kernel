@@ -21,9 +21,14 @@ class CFScriptKernel(Kernel):
                    allow_stdin=False):
         if not silent:
 
-            output = self.box_wrapper.do_execute(code);
-            stream_content = {'name': 'stdout', 'text': output}
-            self.send_response(self.iopub_socket, 'stream', stream_content)
+            responses = self.box_wrapper.do_execute(code)
+
+            for content in responses:
+                if isinstance( content, str ):
+                    stream_content = {'name': 'stdout', 'text': content}
+                    self.send_response(self.iopub_socket, 'stream', stream_content)
+                else:
+                    self.send_response(self.iopub_socket, 'display_data', content)
 
         return {'status': 'ok',
                 # The base class increments the execution count

@@ -1,9 +1,11 @@
-import subprocess, os, logging
-
+import subprocess, os, logging, re
 class CommandBoxWrapper():
 
     PROMPT_STRINGS = ["CFSCRIPT-REPL: ",".............: ","CFML-REPL: ","CommandBox> ",u"\u276F "]
+    CONTINUATION_PROMPT = ".............: "
     CF_REPL_TYPE = "cfscript"
+    CF_REPL_PROMPT = "CFSCRIPT-REPL: "
+    HTML_REGEX = re.compile(r"(?:</[^<]+>)|(?:<[^<]+/>)")
 
     def __init__(self,repl_type = "cfscript", **kwargs):
         # logging.basicConfig(filename='box_wrapper_debug.log',
@@ -11,6 +13,8 @@ class CommandBoxWrapper():
         self.CF_REPL_TYPE = repl_type
         # New version of commandbox (5.9.0) uses a prompt with the current working directory in it
         self.PROMPT_STRINGS.append("CommandBox:" + os.getcwd().split(os.sep)[-1] + ">");
+        if (repl_type != "cfscript"):
+            self.CF_REPL_PROMPT = "CFML-REPL: "
         self.box_shell = self._create_process()
         self._search_for_output()
         self._start_repl()
@@ -27,36 +31,48 @@ class CommandBoxWrapper():
             #start the repl
             self._start_repl()
 
-            return output
-        elif (code[:8] == "$loadjar" or code[:8] == "%loadjar"):
+            return [output]
+        elif (code[:8] == "$loadjar" or code[:8] == "%loadjar"):    
             #Load jar
             output = self._load_jar(code)
 
-            return output
+            return [output]
         else:
             code_lines = code.splitlines()
 
-            response = [];
+            responses = []
+            output_buffer = ""
             for line in code_lines:  
                 self.box_shell.stdin.write( bytes( f"{line.strip()}\n".encode("utf-8") ) )
                 self.box_shell.stdin.flush()
-                output = self._search_for_output()
-                
-                for string in self.PROMPT_STRINGS:
-                    output = output.replace(string,"")
+                raw_output = self._search_for_output()
 
-                if (output.__contains__("[EMPTY STRING]") == False):
-                    response.append(output.strip())
-                    # response.append("\n")
+                if raw_output.__contains__(self.CF_REPL_PROMPT):
+                    content = self._parse_response( raw_output.replace(self.CF_REPL_PROMPT,"") )
+                    responses.append( content )
 
-            return "\n".join(response).strip()
+            return responses
     
+    def _parse_response(self,raw_output):
+            # Lame check for JSON
+            if raw_output.split()[0] in "[,{":
+                return raw_output
+            # Parse for html
+            elif bool( self.HTML_REGEX.search( raw_output ) ):
+                return {
+                    'data': {
+                        'text/html': raw_output,
+                    },
+                    'metadata': {}
+                }
+            else:
+                return raw_output
+
     def _box_install(self,code):
         self.box_shell.stdin.write(bytes(f"install {code.replace('$install','').replace('%install','')}\n".encode("utf-8")))
         self.box_shell.stdin.flush()
         output = self._search_for_output()
-        for string in self.PROMPT_STRINGS:
-            output = output.replace(string,"")
+        output = re.sub("CommandBox:.*>","",output).strip()
         return output
     
     def _load_jar(self,code):
@@ -88,8 +104,6 @@ class CommandBoxWrapper():
 
     def _stop_repl(self):
         self.box_shell.stdin.write(bytes("q\n".encode("utf-8")))
-        self.box_shell.stdin.flush()
-        self.box_shell.stdin.write(bytes("reload\n".encode("utf-8")))
         self.box_shell.stdin.flush()
         self._search_for_output()
 

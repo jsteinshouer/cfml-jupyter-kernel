@@ -21,6 +21,7 @@ COPY --from=foundeo/minibox:2023.01 /root/.CommandBox/ /home/jovyan/.CommandBox/
 
 RUN chmod a+x /home/jovyan/.bin/box \
     && chown -R $NB_UID /home/jovyan/.bin \
+    && curl https://raw.githubusercontent.com/jsteinshouer/commandbox/4cf42084ebd17b4275a416632b54cc809f8f0f43/src/cfml/system/util/REPLParser.cfc >/home/jovyan/.CommandBox/cfml/system/util/REPLParser.cfc \
     && chown -R $NB_UID /home/jovyan/.CommandBox \
     && echo "commandbox_home=${COMMANDBOX_HOME}" > /home/jovyan/.bin/commandbox.properties
 
