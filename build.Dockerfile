@@ -15,9 +15,9 @@ RUN apt-get update \
     && apt-get update \
     && apt-get install -y zulu11-jre-headless
 
-# Install CommandBox from minibox to help make the image smaller
-COPY --from=foundeo/minibox:2023.01 /opt/box /home/jovyan/.bin
-COPY --from=foundeo/minibox:2023.01 /root/.CommandBox/ /home/jovyan/.CommandBox/
+# Install CommandBox v5.9.0
+COPY --from=ortussolutions/commandbox@sha256:c1deedac96dd8ef1826ab5f0701c5c3748027acaf2191d11e0c62483963639d5 /usr/local/bin/box /home/jovyan/.bin/box
+COPY --from=ortussolutions/commandbox@sha256:c1deedac96dd8ef1826ab5f0701c5c3748027acaf2191d11e0c62483963639d5 /usr/local/lib/CommandBox/ /home/jovyan/.CommandBox/
 
 RUN chmod a+x /home/jovyan/.bin/box \
     && chown -R $NB_UID /home/jovyan/.bin \
