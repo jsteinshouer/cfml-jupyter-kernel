@@ -7,7 +7,7 @@ services:
             target: development
         volumes:
             - .:/workspace
-            - ./notebooks:/home/jovyan/cfml_notebooks
+            - ./notebook_examples:/home/jovyan/notebook_examples
         ports:
             - 8888:8888
         environment:
