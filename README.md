@@ -45,9 +45,9 @@ python -m cfml_kernel.cfml.install
 
 ## Run it
 
-I prefer to use the [VS Code Jupyter notebook extension](https://marketplace.visualstudio.com/items?itemName=ms-toolsai.jupyter) to run my notebooks. Here i [blog post](https://jasonsteinshouer.com/using-cfml-jupyter-kernel-with-vscode.html) that explains how to set that up.
+I prefer to use the [VS Code Jupyter notebook extension](https://marketplace.visualstudio.com/items?itemName=ms-toolsai.jupyter) to run my notebooks. Here is a [blog post](https://jasonsteinshouer.com/using-cfml-jupyter-kernel-with-vscode.html) that explains how to set that up.
 
-You can also run it the trafitional way, if you installed `Jupyter`, using this command:
+You can also run it the traditional way, if you installed `Jupyter`, using this command:
 
 ```
 jupyter notebook
