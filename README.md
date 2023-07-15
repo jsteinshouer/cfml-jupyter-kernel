@@ -26,23 +26,18 @@ You will need to have [Jupyter](https://jupyter.org/install) installed or you ca
 
 You can also run it with Docker if you do not want to mess around with installing dependencies. There is a docker image associated with the repository that can be utilized for running it was well. See the other options below.
 
-## Clone the repo
+## Install Kernel 
 
 ```bash
-git clone https://github.com/jsteinshouer/cfml-jupyter-kernel.git
-```
-
-## Install Kernel
-
-```bash
-pip install ./cfml-jupyter-kernel
+pip install cfml-jupyter
 python -m cfml_kernel.cfscript.install
 python -m cfml_kernel.cfml.install
 ```
 
-If you want to develop on the Kernel you can add the `-e` flag to make it editable.
+If you want to develop on the Kernel you can clone it and install it this way. Adding the `-e` flag to make it editable.
 
 ```bash
+git clone https://github.com/jsteinshouer/cfml-jupyter-kernel.git
 pip install -e ./cfml-jupyter-kernel
 python -m cfml_kernel.cfscript.install
 python -m cfml_kernel.cfml.install
@@ -50,7 +45,9 @@ python -m cfml_kernel.cfml.install
 
 ## Run it
 
-I prefer to use the [VS Code Jupyter notebook extension](https://marketplace.visualstudio.com/items?itemName=ms-toolsai.jupyter) to run my notebooks but if you installed `Jupyter` to can run it using this command:
+I prefer to use the [VS Code Jupyter notebook extension](https://marketplace.visualstudio.com/items?itemName=ms-toolsai.jupyter) to run my notebooks. Here i [blog post](https://jasonsteinshouer.com/using-cfml-jupyter-kernel-with-vscode.html) that explains how to set that up.
+
+You can also run it the trafitional way, if you installed `Jupyter`, using this command:
 
 ```
 jupyter notebook
